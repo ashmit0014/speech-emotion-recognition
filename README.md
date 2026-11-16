@@ -1,51 +1,31 @@
-<!-- profile-editorial-cover -->
-<picture>
-  <img src=".github/project-cover.png" alt="Speech-Emotion-Recognition-Project by Ashmit Kundu" width="100%" />
-</picture>
+# Speech emotion recognition
 
-# Speech Emotion Recognition using CNN and RAVDESS Dataset
+A college project: classifying the emotion in short spoken sentences from the [RAVDESS](https://www.kaggle.com/datasets/uwrfkaggler/ravdess-emotional-speech-audio) dataset with a 1-D convolutional network over hand-made audio features.
 
-This project implements a Speech Emotion Recognition (SER) system using deep learning. The model is trained to identify emotions from audio recordings using the **RAVDESS dataset**. It utilizes **Convolutional Neural Networks (CNNs)** with extracted audio features like **MFCCs (Mel-frequency cepstral coefficients)** for emotion classification.
+<img src="docs/confusion-matrix.png" width="520" alt="Confusion matrix over seven emotions: neutral is recognised best, happy worst">
 
----
+## Result
 
-## Project Overview
+| | |
+|---|---|
+| Accuracy | **58 %** over 7 classes (chance is about 14 %) |
+| Data | 1,440 RAVDESS speech clips from 24 actors |
+| Classes | angry, disgust, fear, happy, neutral (calm is counted as neutral), sad, surprise |
 
-Speech Emotion Recognition (SER) is the task of identifying human emotions from speech signals. Unlike speech recognition, SER focuses on *how* something is said rather than *what* is said. This has applications in virtual assistants, customer service analytics, and mental health monitoring.
+Neutral is recognised best and happy worst: happy clips are spread across almost every other class, and many sad clips are predicted as neutral.
 
----
+**How to read the 58 %:** each clip was turned into three training examples (the original, a noisy copy and a pitch-shifted copy) *before* the random 75 / 25 split, so copies of the same recording can sit on both sides. That makes the score optimistic. A fair test would hold out whole actors.
 
-## Dataset
+## How it works
 
-- **Name**: RAVDESS (Ryerson Audio-Visual Database of Emotional Speech and Song)
-- **Source**: [Official RAVDESS on Kaggle](https://www.kaggle.com/datasets/uwrfkaggler/ravdess-emotional-speech-audio)
-- **Classes**: Neutral, Calm, Happy, Sad, Angry, Fearful, Disgust, Surprised
-- **Format**: 735 speech audio files from 24 speakers (16-bit WAV, 48kHz)
+1. **Features** (Librosa), averaged over each clip: zero-crossing rate, chroma, MFCCs, RMS energy and mel spectrogram.
+2. **Augmentation:** added noise, and a time-stretch plus pitch shift.
+3. **Model** (Keras): stacked 1-D convolutions with batch normalisation, max pooling and dropout, then dense layers and a softmax over the classes.
 
----
+## Run it
 
-## Features Extracted
+Open `Speech Emotion Recognition.ipynb`. It was run on Kaggle with the RAVDESS dataset attached; elsewhere, download the dataset and change the `RAV` path in the first data cell.
 
-The following audio features were extracted using Librosa:
-
-- MFCCs (Mel-Frequency Cepstral Coefficients)
-- Chroma
-- Spectral Contrast
-- Tonnetz
-- Zero-Crossing Rate
-- Root Mean Square Energy
-
----
-
-## Model Architecture
-
-A Convolutional Neural Network (CNN) was built using Keras:
-
-- 1D Convolutional Layers with ReLU activation
-- Batch Normalization
-- MaxPooling layers
-- Dropout for regularization
-- Dense layers for classification
-- Softmax activation in the output layer
-
----
+```bash
+pip install librosa tensorflow scikit-learn seaborn pandas matplotlib
+```
